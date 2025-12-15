@@ -1,59 +1,330 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# PHP_Laravel12_Use_Multiple_Database
 
 <p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
+  <img src="https://img.shields.io/badge/Laravel-12.x-FF2D20?style=for-the-badge&logo=laravel">
+  <img src="https://img.shields.io/badge/Database-MySQL-blue?style=for-the-badge&logo=mysql">
+  <img src="https://img.shields.io/badge/Multiple-Databases-success?style=for-the-badge">
 </p>
 
-## About Laravel
+---
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+##  Overview
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+This documentation explains how to **configure and use multiple MySQL databases in Laravel 12**
+from **installation to final testing**.
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+You will learn how to:
+- Configure two databases in `.env`
+- Register multiple connections in `config/database.php`
+- Run migrations on different databases
+- Fetch data from default & second database
+- Dynamically switch database connection in models
 
-## Learning Laravel
+---
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+---
 
-## Laravel Sponsors
+##  Features
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+-  Connect multiple MySQL databases in a single Laravel 12 application  
+-  Easy configuration using `.env` file  
+-  Support for **default & secondary database** connections  
+-  Dynamic database switching at runtime  
+-  Run migrations on specific databases  
+-  Fetch data independently from each database  
+-  Simple testing using routes  
+-  Fully compatible with Laravel 12  
 
-### Premium Partners
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+##  Folder Structure
 
-## Contributing
+```
+app/
+├── Http/
+│   └── Controllers/
+│       └── ProductController.php
+├── Models/
+│   └── Product.php
+config/
+└── database.php
+routes/
+└── web.php
+database/
+└── migrations/
+.env
+README.md
+```
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+---
 
-## Code of Conduct
+##  STEP 1: Install Laravel
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+```bash
+composer create-project laravel/laravel multi-db-project
+cd multi-db-project
+```
 
-## Security Vulnerabilities
+---
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+##  STEP 2: Configure .env File (IMPORTANT)
 
-## License
+Open `.env` file and configure **TWO DATABASES**.
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+```env
+# DEFAULT DATABASE (MySQL)
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=blog
+DB_USERNAME=root
+DB_PASSWORD=
+
+# SECOND DATABASE (MySQL)
+DB_CONNECTION_SECOND=mysql
+DB_HOST_SECOND=127.0.0.1
+DB_PORT_SECOND=3306
+DB_DATABASE_SECOND=blog2
+DB_USERNAME_SECOND=root
+DB_PASSWORD_SECOND=
+```
+
+Clear cache:
+
+```bash
+php artisan optimize:clear
+```
+
+---
+
+##  STEP 3: Configure Multiple Databases
+
+Open:
+
+```
+config/database.php
+```
+
+Add second MySQL connection:
+
+```php
+'default' => env('DB_CONNECTION', 'mysql'),
+
+'connections' => [
+
+    'mysql' => [
+        'driver' => 'mysql',
+        'host' => env('DB_HOST'),
+        'port' => env('DB_PORT'),
+        'database' => env('DB_DATABASE'),
+        'username' => env('DB_USERNAME'),
+        'password' => env('DB_PASSWORD'),
+        'charset' => 'utf8mb4',
+        'collation' => 'utf8mb4_unicode_ci',
+        'prefix' => '',
+        'strict' => true,
+    ],
+
+    'mysql_second' => [
+        'driver' => 'mysql',
+        'host' => env('DB_HOST_SECOND'),
+        'port' => env('DB_PORT_SECOND'),
+        'database' => env('DB_DATABASE_SECOND'),
+        'username' => env('DB_USERNAME_SECOND'),
+        'password' => env('DB_PASSWORD_SECOND'),
+        'charset' => 'utf8mb4',
+        'collation' => 'utf8mb4_unicode_ci',
+        'prefix' => '',
+        'strict' => true,
+    ],
+];
+```
+
+Clear config cache again:
+
+```bash
+php artisan config:clear
+```
+
+---
+
+##  STEP 4: Create Products Table (Migration)
+
+```bash
+php artisan make:migration create_products_table
+```
+
+Migration file:
+
+```php
+Schema::create('products', function (Blueprint $table) {
+    $table->id();
+    $table->string('name');
+    $table->timestamps();
+});
+```
+
+Run migration for **default database**:
+
+```bash
+php artisan migrate
+```
+
+---
+
+##  STEP 5: Create Same Table in Second Database
+
+Edit migration OR create another migration:
+
+```php
+Schema::connection('mysql_second')->create('products', function (Blueprint $table) {
+    $table->id();
+    $table->string('name');
+    $table->timestamps();
+});
+```
+
+Run again:
+
+```bash
+php artisan migrate
+```
+
+✔ Now **both databases** have `products` table.
+
+---
+
+##  STEP 6: Product Model
+
+ `app/Models/Product.php`
+
+```php
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+
+class Product extends Model
+{
+    use HasFactory;
+
+    protected $fillable = ['name'];
+}
+```
+
+---
+
+##  STEP 7: Controller
+
+```bash
+php artisan make:controller ProductController
+```
+
+ `app/Http/Controllers/ProductController.php`
+
+```php
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\Product;
+
+class ProductController extends Controller
+{
+    /**
+     * Fetch record from second database
+     */
+    public function getRecord()
+    {
+        $product = new Product;
+
+        // Switch database connection dynamically
+        $product->setConnection('mysql_second');
+
+        return $product->find(1);
+    }
+}
+```
+
+---
+
+##  STEP 8: Routes to Fetch Data
+
+ `routes/web.php`
+
+```php
+use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\DB;
+
+/*
+| Get Products from Default Database
+*/
+Route::get('/get-mysql-products', function () {
+    $products = DB::table('products')->get();
+    dd($products);
+});
+
+/*
+| Get Products from Second Database
+*/
+Route::get('/get-mysql-second-products', function () {
+    $products = DB::connection('mysql_second')
+                  ->table('products')
+                  ->get();
+    dd($products);
+});
+```
+
+---
+
+##  STEP 9: Insert Test Data
+
+**Default Database (blog)**
+
+```sql
+INSERT INTO products (name)
+VALUES ('Product From Default DB');
+```
+
+**Second Database (blog2)**
+
+```sql
+INSERT INTO products (name)
+VALUES ('Product From Second DB');
+```
+
+---
+
+##  STEP 10: Final Testing (MOST IMPORTANT)
+
+### Test Default DB
+
+```
+http://127.0.0.1:8000/get-mysql-products
+```
+<img width="502" height="187" alt="Screenshot 2025-12-15 153241" src="https://github.com/user-attachments/assets/9f6dea77-90e7-493f-8881-d9657686a40a" />
+
+
+### Test Second DB
+
+```
+http://127.0.0.1:8000/get-mysql-second-products
+```
+<img width="502" height="187" alt="Screenshot 2025-12-15 153241" src="https://github.com/user-attachments/assets/dd849f54-4426-445e-bb97-3f52eedd95da" />
+
+---
+
+##  FINAL CONFIRMATION
+
+✔ Laravel installed  
+✔ Multiple databases configured  
+✔ Migrations working  
+✔ Routes working  
+✔ Data coming from correct DB  
+
+ **MULTIPLE DATABASE SETUP 100% SUCCESSFUL** 
+
+---
+
