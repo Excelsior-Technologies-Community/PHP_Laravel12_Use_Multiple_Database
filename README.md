@@ -62,7 +62,6 @@ README.md
 
 ```bash
 composer create-project laravel/laravel multi-db-project
-cd multi-db-project
 ```
 
 ---
