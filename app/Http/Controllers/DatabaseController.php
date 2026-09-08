@@ -13,8 +13,13 @@ class DatabaseController extends Controller
      */
     public function dashboard()
     {
-        $defaultDatabase = config('database.connections.mysql.database');
-        $secondDatabase = config('database.connections.mysql_second.database');
+        $defaultDatabase = config(
+            'database.connections.mysql.database'
+        );
+
+        $secondDatabase = config(
+            'database.connections.mysql_second.database'
+        );
 
         $defaultProducts = 0;
         $secondProducts = 0;
@@ -23,8 +28,15 @@ class DatabaseController extends Controller
         $defaultConnected = false;
         $secondConnected = false;
 
+        /*
+        |--------------------------------------------------------------------------
+        | Primary Database
+        |--------------------------------------------------------------------------
+        */
+
         try {
             DB::connection('mysql')->getPdo();
+
             $defaultConnected = true;
 
             $defaultProducts = DB::connection('mysql')
@@ -33,8 +45,8 @@ class DatabaseController extends Controller
 
             if (
                 DB::connection('mysql')
-                    ->getSchemaBuilder()
-                    ->hasTable('blog')
+                ->getSchemaBuilder()
+                ->hasTable('blog')
             ) {
                 $blogCount = DB::connection('mysql')
                     ->table('blog')
@@ -43,25 +55,41 @@ class DatabaseController extends Controller
         } catch (Throwable $e) {
             Log::error(
                 'Default database dashboard error: ' .
-                $e->getMessage()
+                    $e->getMessage()
             );
         }
 
+        /*
+        |--------------------------------------------------------------------------
+        | Secondary Database
+        |--------------------------------------------------------------------------
+        */
+
         try {
             DB::connection('mysql_second')->getPdo();
+
             $secondConnected = true;
 
-            $secondProducts = DB::connection('mysql_second')
+            $secondProducts = DB::connection(
+                'mysql_second'
+            )
                 ->table('products')
                 ->count();
         } catch (Throwable $e) {
             Log::error(
                 'Second database dashboard error: ' .
-                $e->getMessage()
+                    $e->getMessage()
             );
         }
 
+        /*
+        |--------------------------------------------------------------------------
+        | Latest Products
+        |--------------------------------------------------------------------------
+        */
+
         $latestDefaultProducts = collect();
+
         $latestSecondProducts = collect();
 
         if ($defaultConnected) {
@@ -74,14 +102,16 @@ class DatabaseController extends Controller
             } catch (Throwable $e) {
                 Log::error(
                     'Default products error: ' .
-                    $e->getMessage()
+                        $e->getMessage()
                 );
             }
         }
 
         if ($secondConnected) {
             try {
-                $latestSecondProducts = DB::connection('mysql_second')
+                $latestSecondProducts = DB::connection(
+                    'mysql_second'
+                )
                     ->table('products')
                     ->latest('id')
                     ->limit(5)
@@ -89,10 +119,55 @@ class DatabaseController extends Controller
             } catch (Throwable $e) {
                 Log::error(
                     'Second products error: ' .
-                    $e->getMessage()
+                        $e->getMessage()
                 );
             }
         }
+
+        /*
+        |--------------------------------------------------------------------------
+        | Synchronization Statistics
+        |--------------------------------------------------------------------------
+        */
+
+        $syncedCount = 0;
+        $pendingSyncCount = 0;
+
+        try {
+            $primaryNames = DB::connection('mysql')
+                ->table('products')
+                ->pluck('name');
+
+            if ($primaryNames->isNotEmpty()) {
+                $syncedCount = DB::connection('mysql_second')
+                    ->table('products')
+                    ->whereIn('name', $primaryNames)
+                    ->count();
+
+                $pendingSyncCount =
+                    $primaryNames->count() -
+                    $syncedCount;
+
+                if ($pendingSyncCount < 0) {
+                    $pendingSyncCount = 0;
+                }
+            }
+        } catch (Throwable $e) {
+            Log::error(
+                'Synchronization statistics failed: ' .
+                    $e->getMessage()
+            );
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | Total
+        |--------------------------------------------------------------------------
+        */
+
+        $totalProducts =
+            $defaultProducts +
+            $secondProducts;
 
         return view(
             'database.dashboard',
@@ -105,13 +180,16 @@ class DatabaseController extends Controller
                 'defaultConnected',
                 'secondConnected',
                 'latestDefaultProducts',
-                'latestSecondProducts'
+                'latestSecondProducts',
+                'syncedCount',
+                'pendingSyncCount',
+                'totalProducts'
             )
         );
     }
 
     /**
-     * Display database health information.
+     * Database health monitor.
      */
     public function health()
     {
@@ -120,6 +198,7 @@ class DatabaseController extends Controller
                 'name' => 'Primary Database',
                 'connection' => 'mysql',
             ],
+
             'mysql_second' => [
                 'name' => 'Secondary Database',
                 'connection' => 'mysql_second',
@@ -138,14 +217,16 @@ class DatabaseController extends Controller
 
                 $connection->getPdo();
 
-                $databaseName = $connection->getDatabaseName();
+                $databaseName =
+                    $connection->getDatabaseName();
 
                 $responseTime = round(
                     (microtime(true) - $start) * 1000,
                     2
                 );
 
-                $productsTableExists = $connection
+                $productsTableExists =
+                    $connection
                     ->getSchemaBuilder()
                     ->hasTable('products');
 
@@ -158,39 +239,66 @@ class DatabaseController extends Controller
                 }
 
                 $results[$key] = [
-                    'name' => $database['name'],
-                    'connection' => $database['connection'],
+                    'name' =>
+                    $database['name'],
+
+                    'connection' =>
+                    $database['connection'],
+
                     'status' => true,
-                    'database' => $databaseName,
+
+                    'database' =>
+                    $databaseName,
+
                     'host' => config(
                         "database.connections.{$database['connection']}.host"
                     ),
+
                     'port' => config(
                         "database.connections.{$database['connection']}.port"
                     ),
-                    'response_time' => $responseTime,
-                    'products_table' => $productsTableExists,
-                    'product_count' => $productCount,
+
+                    'response_time' =>
+                    $responseTime,
+
+                    'products_table' =>
+                    $productsTableExists,
+
+                    'product_count' =>
+                    $productCount,
+
                     'error' => null,
                 ];
             } catch (Throwable $e) {
                 $results[$key] = [
-                    'name' => $database['name'],
-                    'connection' => $database['connection'],
+                    'name' =>
+                    $database['name'],
+
+                    'connection' =>
+                    $database['connection'],
+
                     'status' => false,
+
                     'database' => config(
                         "database.connections.{$database['connection']}.database"
                     ),
+
                     'host' => config(
                         "database.connections.{$database['connection']}.host"
                     ),
+
                     'port' => config(
                         "database.connections.{$database['connection']}.port"
                     ),
+
                     'response_time' => null,
+
                     'products_table' => false,
+
                     'product_count' => 0,
-                    'error' => $e->getMessage(),
+
+                    'error' =>
+                    $e->getMessage(),
                 ];
             }
         }
@@ -202,10 +310,7 @@ class DatabaseController extends Controller
     }
 
     /**
-     * Synchronize one product from primary database
-     * to secondary database.
-     *
-     * Products are matched by NAME instead of ID.
+     * Sync one product.
      */
     public function syncProduct($id)
     {
@@ -224,14 +329,9 @@ class DatabaseController extends Controller
                     );
             }
 
-            /*
-             * Check duplicate by product name.
-             *
-             * We intentionally do NOT check the ID because
-             * both databases can have different products
-             * using the same numeric ID.
-             */
-            $alreadyExists = DB::connection('mysql_second')
+            $alreadyExists = DB::connection(
+                'mysql_second'
+            )
                 ->table('products')
                 ->where('name', $product->name)
                 ->exists();
@@ -245,19 +345,20 @@ class DatabaseController extends Controller
                     );
             }
 
-            /*
-             * Do not insert the primary ID.
-             *
-             * The secondary database will generate
-             * its own ID automatically.
-             */
             DB::connection('mysql_second')
                 ->table('products')
                 ->insert([
-                    'name' => $product->name,
-                    'detail' => $product->detail ?? null,
-                    'created_at' => $product->created_at,
-                    'updated_at' => $product->updated_at,
+                    'name' =>
+                    $product->name,
+
+                    'detail' =>
+                    $product->detail ?? null,
+
+                    'created_at' =>
+                    $product->created_at,
+
+                    'updated_at' =>
+                    $product->updated_at,
                 ]);
 
             return redirect()
@@ -269,7 +370,7 @@ class DatabaseController extends Controller
         } catch (Throwable $e) {
             Log::error(
                 'Product synchronization failed: ' .
-                $e->getMessage()
+                    $e->getMessage()
             );
 
             return redirect()
@@ -277,16 +378,13 @@ class DatabaseController extends Controller
                 ->with(
                     'error',
                     'Synchronization failed: ' .
-                    $e->getMessage()
+                        $e->getMessage()
                 );
         }
     }
 
     /**
-     * Synchronize all products from primary database
-     * to secondary database.
-     *
-     * Products are matched by NAME instead of ID.
+     * Sync all products.
      */
     public function syncAll()
     {
@@ -299,32 +397,33 @@ class DatabaseController extends Controller
             $skipped = 0;
 
             foreach ($products as $product) {
-
-                /*
-                 * Check by NAME instead of ID.
-                 */
-                $exists = DB::connection('mysql_second')
+                $exists = DB::connection(
+                    'mysql_second'
+                )
                     ->table('products')
                     ->where('name', $product->name)
                     ->exists();
 
                 if ($exists) {
                     $skipped++;
+
                     continue;
                 }
 
-                /*
-                 * Do not copy the primary ID.
-                 * Let the secondary database generate
-                 * its own auto-increment ID.
-                 */
                 DB::connection('mysql_second')
                     ->table('products')
                     ->insert([
-                        'name' => $product->name,
-                        'detail' => $product->detail ?? null,
-                        'created_at' => $product->created_at,
-                        'updated_at' => $product->updated_at,
+                        'name' =>
+                        $product->name,
+
+                        'detail' =>
+                        $product->detail ?? null,
+
+                        'created_at' =>
+                        $product->created_at,
+
+                        'updated_at' =>
+                        $product->updated_at,
                     ]);
 
                 $synced++;
@@ -335,12 +434,12 @@ class DatabaseController extends Controller
                 ->with(
                     'success',
                     "{$synced} product(s) synchronized successfully. " .
-                    "{$skipped} existing product(s) skipped."
+                        "{$skipped} existing product(s) skipped."
                 );
         } catch (Throwable $e) {
             Log::error(
                 'All products synchronization failed: ' .
-                $e->getMessage()
+                    $e->getMessage()
             );
 
             return redirect()
@@ -348,7 +447,7 @@ class DatabaseController extends Controller
                 ->with(
                     'error',
                     'Synchronization failed: ' .
-                    $e->getMessage()
+                        $e->getMessage()
                 );
         }
     }

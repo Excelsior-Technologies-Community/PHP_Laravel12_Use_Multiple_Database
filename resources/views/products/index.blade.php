@@ -1,10 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Product Synchronization</title>
+    <title>Product Manager</title>
 
     <style>
         * {
@@ -13,145 +14,168 @@
 
         body {
             margin: 0;
-            padding: 0;
-            font-family: Arial, Helvetica, sans-serif;
-            background: #f5f7fb;
+            font-family: Arial, sans-serif;
+            background: #f4f6f9;
             color: #1f2937;
-        }
-
-        .container {
-            width: 92%;
-            max-width: 1250px;
-            margin: 40px auto;
         }
 
         .navbar {
             background: #111827;
-            padding: 16px 22px;
-            border-radius: 10px;
+            padding: 18px 40px;
             display: flex;
-            align-items: center;
             justify-content: space-between;
-            margin-bottom: 30px;
+            align-items: center;
         }
 
         .navbar h2 {
             color: white;
             margin: 0;
-            font-size: 22px;
-        }
-
-        .nav-links {
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
         }
 
         .nav-links a {
-            color: white;
+            color: #d1d5db;
             text-decoration: none;
-            background: #374151;
-            padding: 9px 14px;
-            border-radius: 6px;
-            font-size: 14px;
+            margin-left: 20px;
         }
 
         .nav-links a:hover {
-            background: #4b5563;
+            color: white;
         }
 
-        .page-header {
-            background: white;
-            padding: 25px;
-            border-radius: 10px;
+        .container {
+            max-width: 1400px;
+            margin: 35px auto;
+            padding: 0 20px;
+        }
+
+        .header {
             margin-bottom: 25px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
         }
 
-        .page-header h1 {
-            margin: 0 0 8px;
-            font-size: 28px;
+        .header h1 {
+            margin-bottom: 8px;
         }
 
-        .page-header p {
+        .header p {
+            color: #6b7280;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+
+        .stat {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, .06);
+        }
+
+        .stat h3 {
             margin: 0;
             color: #6b7280;
+            font-size: 14px;
+        }
+
+        .stat .number {
+            font-size: 30px;
+            font-weight: bold;
+            margin-top: 8px;
+        }
+
+        .toolbar {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, .06);
+        }
+
+        .filters {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr auto auto;
+            gap: 12px;
+        }
+
+        input,
+        select {
+            width: 100%;
+            padding: 11px;
+            border: 1px solid #d1d5db;
+            border-radius: 7px;
+            background: white;
+        }
+
+        .btn {
+            border: none;
+            padding: 11px 17px;
+            border-radius: 7px;
+            text-decoration: none;
+            cursor: pointer;
+            font-size: 14px;
+            display: inline-block;
+        }
+
+        .btn-primary {
+            background: #2563eb;
+            color: white;
+        }
+
+        .btn-success {
+            background: #16a34a;
+            color: white;
+        }
+
+        .btn-warning {
+            background: #d97706;
+            color: white;
+        }
+
+        .btn-danger {
+            background: #dc2626;
+            color: white;
+        }
+
+        .btn-secondary {
+            background: #6b7280;
+            color: white;
+        }
+
+        .btn:hover {
+            opacity: .9;
         }
 
         .alert {
             padding: 14px 18px;
             border-radius: 8px;
             margin-bottom: 20px;
-            font-size: 15px;
         }
 
-        .alert-success {
+        .success {
             background: #dcfce7;
             color: #166534;
-            border: 1px solid #86efac;
+            border: 1px solid #bbf7d0;
         }
 
-        .alert-warning {
+        .warning {
             background: #fef3c7;
             color: #92400e;
-            border: 1px solid #fcd34d;
+            border: 1px solid #fde68a;
         }
 
-        .alert-danger {
+        .error {
             background: #fee2e2;
             color: #991b1b;
-            border: 1px solid #fca5a5;
+            border: 1px solid #fecaca;
         }
 
-        .info-box {
-            background: #eff6ff;
-            border: 1px solid #bfdbfe;
+        .info {
+            background: #dbeafe;
             color: #1e40af;
-            padding: 16px 18px;
-            border-radius: 8px;
-            margin-bottom: 25px;
-            line-height: 1.6;
-        }
-
-        .info-box strong {
-            color: #1e3a8a;
-        }
-
-        .action-bar {
-            background: white;
-            padding: 18px;
-            border-radius: 10px;
-            margin-bottom: 25px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 15px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-        }
-
-        .action-bar h3 {
-            margin: 0;
-            font-size: 18px;
-        }
-
-        .sync-all-btn {
-            background: #2563eb;
-            color: white;
-            border: none;
-            padding: 11px 18px;
-            border-radius: 7px;
-            cursor: pointer;
-            font-size: 14px;
-            font-weight: bold;
-        }
-
-        .sync-all-btn:hover {
-            background: #1d4ed8;
-        }
-
-        .sync-all-btn:disabled {
-            background: #9ca3af;
-            cursor: not-allowed;
+            border: 1px solid #bfdbfe;
         }
 
         .database-grid {
@@ -162,9 +186,9 @@
 
         .database-card {
             background: white;
-            border-radius: 10px;
+            border-radius: 12px;
             overflow: hidden;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, .06);
         }
 
         .database-header {
@@ -172,23 +196,16 @@
             color: white;
         }
 
-        .primary-header {
+        .primary {
             background: #2563eb;
         }
 
-        .secondary-header {
+        .secondary {
             background: #059669;
         }
 
         .database-header h2 {
             margin: 0 0 5px;
-            font-size: 20px;
-        }
-
-        .database-header p {
-            margin: 0;
-            opacity: 0.9;
-            font-size: 13px;
         }
 
         .table-wrapper {
@@ -200,140 +217,140 @@
             border-collapse: collapse;
         }
 
+        th,
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #e5e7eb;
+            text-align: left;
+        }
+
         th {
             background: #f9fafb;
-            color: #374151;
-            font-size: 13px;
-            text-align: left;
-            padding: 13px 15px;
-            border-bottom: 1px solid #e5e7eb;
         }
 
-        td {
-            padding: 13px 15px;
-            border-bottom: 1px solid #e5e7eb;
-            font-size: 14px;
-            vertical-align: middle;
-        }
-
-        tr:last-child td {
-            border-bottom: none;
-        }
-
-        tr:hover td {
-            background: #f9fafb;
-        }
-
-        .id-badge {
-            display: inline-block;
-            background: #e5e7eb;
-            color: #374151;
-            padding: 4px 8px;
-            border-radius: 5px;
-            font-size: 12px;
-            font-weight: bold;
-        }
-
-        .product-name {
-            font-weight: bold;
-            color: #111827;
-        }
-
-        .detail {
-            color: #6b7280;
-            line-height: 1.4;
-        }
-
-        .sync-btn {
-            background: #16a34a;
-            color: white;
-            border: none;
-            padding: 8px 12px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 12px;
-            font-weight: bold;
-        }
-
-        .sync-btn:hover {
-            background: #15803d;
-        }
-
-        .sync-btn:disabled {
-            background: #9ca3af;
-            cursor: not-allowed;
-        }
-
-        .empty-state {
-            padding: 35px 20px;
-            text-align: center;
-            color: #6b7280;
-        }
-
-        .empty-state strong {
-            display: block;
-            color: #374151;
-            margin-bottom: 5px;
-        }
-
-        .status-badge {
-            display: inline-block;
+        .badge {
             padding: 5px 9px;
             border-radius: 20px;
             font-size: 11px;
             font-weight: bold;
+            display: inline-block;
         }
 
-        .status-ready {
+        .badge-success {
             background: #dcfce7;
             color: #166534;
         }
 
-        .footer-note {
-            margin-top: 25px;
-            background: white;
-            padding: 18px;
-            border-radius: 10px;
-            color: #6b7280;
-            font-size: 13px;
-            line-height: 1.6;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
+        .badge-warning {
+            background: #fef3c7;
+            color: #92400e;
         }
 
-        @media (max-width: 900px) {
+        .actions {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+
+        .actions .btn {
+            padding: 7px 10px;
+            font-size: 12px;
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | Numeric Pagination Only
+        |--------------------------------------------------------------------------
+        */
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 6px;
+            padding: 20px;
+        }
+
+        .pagination a,
+        .pagination span {
+            min-width: 36px;
+            height: 36px;
+            padding: 8px 11px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            text-align: center;
+            text-decoration: none;
+            color: #374151;
+            background: white;
+            font-size: 14px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .pagination a:hover {
+            background: #2563eb;
+            color: white;
+            border-color: #2563eb;
+        }
+
+        .pagination .active {
+            background: #2563eb;
+            color: white;
+            border-color: #2563eb;
+            font-weight: bold;
+        }
+
+        .empty {
+            padding: 35px;
+            text-align: center;
+            color: #6b7280;
+        }
+
+        .section-title {
+            padding: 20px 20px 0;
+        }
+
+        .action-bar {
+            margin-bottom: 20px;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        @media(max-width: 1000px) {
+
+            .stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
             .database-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .filters {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        @media(max-width: 600px) {
+
+            .stats {
+                grid-template-columns: 1fr;
+            }
+
+            .filters {
                 grid-template-columns: 1fr;
             }
 
             .navbar {
                 flex-direction: column;
-                align-items: flex-start;
-                gap: 15px;
+                gap: 12px;
+                padding: 15px 20px;
             }
 
-            .action-bar {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-        }
-
-        @media (max-width: 600px) {
-            .container {
-                width: 95%;
-                margin: 20px auto;
-            }
-
-            .page-header h1 {
-                font-size: 23px;
-            }
-
-            .database-header h2 {
-                font-size: 18px;
-            }
-
-            th,
-            td {
-                padding: 10px;
+            .nav-links a {
+                margin: 0 6px;
             }
         }
     </style>
@@ -341,299 +358,881 @@
 
 <body>
 
+<nav class="navbar">
+
+    <h2>
+        Multi-Database Manager
+    </h2>
+
+    <div class="nav-links">
+
+        <a href="{{ route('dashboard') }}">
+            Dashboard
+        </a>
+
+        <a href="{{ route('products.index') }}">
+            Products
+        </a>
+
+        <a href="{{ route('database.health') }}">
+            Health Monitor
+        </a>
+
+    </div>
+
+</nav>
+
+
 <div class="container">
 
-    {{-- Navigation --}}
-    <div class="navbar">
-        <h2>Multi-Database System</h2>
+    <div class="header">
 
-        <div class="nav-links">
-            <a href="{{ route('dashboard') }}">Dashboard</a>
-            <a href="{{ route('products.index') }}">Products</a>
-            <a href="{{ route('database.health') }}">Database Health</a>
-        </div>
-    </div>
+        <h1>
+            Product Management
+        </h1>
 
-    {{-- Page Header --}}
-    <div class="page-header">
-        <h1>Product Synchronization</h1>
         <p>
-            Synchronize products from the primary MySQL database
-            to the secondary MySQL database.
+            Manage products stored in both MySQL databases.
         </p>
+
     </div>
 
-    {{-- Session Messages --}}
+
+    {{-- =========================================================
+         SUCCESS MESSAGE
+         ========================================================= --}}
+
     @if(session('success'))
-        <div class="alert alert-success">
+
+        <div class="alert success">
+
             <strong>Success:</strong>
+
             {{ session('success') }}
+
         </div>
+
     @endif
+
+
+    {{-- =========================================================
+         CREATE SUCCESS
+         ========================================================= --}}
+
+    @if(session('created'))
+
+        <div class="alert success">
+
+            <strong>Product Created:</strong>
+
+            {{ session('created') }}
+
+        </div>
+
+    @endif
+
+
+    {{-- =========================================================
+         UPDATE SUCCESS
+         ========================================================= --}}
+
+    @if(session('updated'))
+
+        <div class="alert success">
+
+            <strong>Product Updated:</strong>
+
+            {{ session('updated') }}
+
+        </div>
+
+    @endif
+
+
+    {{-- =========================================================
+         DELETE SUCCESS
+         ========================================================= --}}
+
+    @if(session('deleted'))
+
+        <div class="alert success">
+
+            <strong>Product Deleted:</strong>
+
+            {{ session('deleted') }}
+
+        </div>
+
+    @endif
+
+
+    {{-- =========================================================
+         SYNC SUCCESS
+         ========================================================= --}}
+
+    @if(session('synced'))
+
+        <div class="alert success">
+
+            <strong>Synchronization Successful:</strong>
+
+            {{ session('synced') }}
+
+        </div>
+
+    @endif
+
+
+    {{-- =========================================================
+         WARNING MESSAGE
+         ========================================================= --}}
 
     @if(session('warning'))
-        <div class="alert alert-warning">
+
+        <div class="alert warning">
+
             <strong>Warning:</strong>
+
             {{ session('warning') }}
+
         </div>
+
     @endif
+
+
+    {{-- =========================================================
+         ERROR MESSAGE
+         ========================================================= --}}
 
     @if(session('error'))
-        <div class="alert alert-danger">
+
+        <div class="alert error">
+
             <strong>Error:</strong>
+
             {{ session('error') }}
+
         </div>
+
     @endif
 
-    {{-- Synchronization Rule --}}
-    <div class="info-box">
-        <strong>Synchronization Rule:</strong>
-        Products are matched by their
-        <strong>name</strong>, not their database ID.
-        This is important because the primary and secondary databases
-        can have different IDs for their products.
 
-        <br>
+    {{-- =========================================================
+         VALIDATION ERRORS
+         ========================================================= --}}
 
-        For example, if the primary database contains
-        <strong>Laptop (ID 1)</strong> and the secondary database contains
-        <strong>Monitor (ID 1)</strong>, they are treated as different
-        products.
+    @if($errors->any())
 
-        <br>
+        <div class="alert error">
 
-        When a new product is synchronized, the secondary database
-        automatically generates its own ID.
+            <strong>Please fix the following errors:</strong>
+
+            <ul style="margin-bottom:0;">
+
+                @foreach($errors->all() as $error)
+
+                    <li>
+                        {{ $error }}
+                    </li>
+
+                @endforeach
+
+            </ul>
+
+        </div>
+
+    @endif
+
+
+    {{-- =========================================================
+         STATISTICS
+         ========================================================= --}}
+
+    <div class="stats">
+
+        <div class="stat">
+
+            <h3>
+                Primary Products
+            </h3>
+
+            <div class="number">
+                {{ $primaryTotal }}
+            </div>
+
+        </div>
+
+
+        <div class="stat">
+
+            <h3>
+                Secondary Products
+            </h3>
+
+            <div class="number">
+                {{ $secondaryTotal }}
+            </div>
+
+        </div>
+
+
+        <div class="stat">
+
+            <h3>
+                Synchronized
+            </h3>
+
+            <div class="number">
+                {{ $syncedCount }}
+            </div>
+
+        </div>
+
+
+        <div class="stat">
+
+            <h3>
+                Pending Sync
+            </h3>
+
+            <div class="number">
+                {{ max(0, $primaryTotal - $syncedCount) }}
+            </div>
+
+        </div>
+
     </div>
 
-    {{-- Action Bar --}}
+
+    {{-- =========================================================
+         SEARCH / FILTER / SORT
+         ========================================================= --}}
+
+    <div class="toolbar">
+
+        <form
+            method="GET"
+            action="{{ route('products.index') }}"
+        >
+
+            <div class="filters">
+
+                <input
+                    type="text"
+                    name="search"
+                    value="{{ $search }}"
+                    placeholder="Search product name or detail..."
+                >
+
+
+                <select name="database">
+
+                    <option
+                        value="all"
+                        {{ $database === 'all' ? 'selected' : '' }}
+                    >
+                        All Databases
+                    </option>
+
+                    <option
+                        value="mysql"
+                        {{ $database === 'mysql' ? 'selected' : '' }}
+                    >
+                        Primary Database
+                    </option>
+
+                    <option
+                        value="mysql_second"
+                        {{ $database === 'mysql_second' ? 'selected' : '' }}
+                    >
+                        Secondary Database
+                    </option>
+
+                </select>
+
+
+                <select name="sort">
+
+                    <option
+                        value="newest"
+                        {{ $sort === 'newest' ? 'selected' : '' }}
+                    >
+                        Newest
+                    </option>
+
+                    <option
+                        value="oldest"
+                        {{ $sort === 'oldest' ? 'selected' : '' }}
+                    >
+                        Oldest
+                    </option>
+
+                    <option
+                        value="name_asc"
+                        {{ $sort === 'name_asc' ? 'selected' : '' }}
+                    >
+                        Name A-Z
+                    </option>
+
+                    <option
+                        value="name_desc"
+                        {{ $sort === 'name_desc' ? 'selected' : '' }}
+                    >
+                        Name Z-A
+                    </option>
+
+                </select>
+
+
+                <button
+                    type="submit"
+                    class="btn btn-primary"
+                >
+                    Search
+                </button>
+
+
+                <a
+                    href="{{ route('products.index') }}"
+                    class="btn btn-secondary"
+                >
+                    Reset
+                </a>
+
+            </div>
+
+        </form>
+
+    </div>
+
+
+    {{-- =========================================================
+         ACTION BUTTONS
+         ========================================================= --}}
+
     <div class="action-bar">
 
-        <div>
-            <h3>Synchronization Controls</h3>
+        <a
+            href="{{ route('products.create') }}"
+            class="btn btn-success"
+        >
+            + Add Product
+        </a>
 
-            <span class="status-badge status-ready">
-                Name-Based Synchronization Enabled
-            </span>
-        </div>
 
-        @if(isset($defaultProducts) && $defaultProducts->count() > 0)
-            <form
-                action="{{ route('products.sync-all') }}"
-                method="POST"
-                onsubmit="return confirm('Are you sure you want to synchronize all products?');"
+        <form
+            action="{{ route('products.sync-all') }}"
+            method="POST"
+            style="display:inline;"
+            onsubmit="return confirm('Synchronize all primary products to secondary database?');"
+        >
+
+            @csrf
+
+            <button
+                type="submit"
+                class="btn btn-primary"
             >
-                @csrf
+                Sync All Products
+            </button>
 
-                <button type="submit" class="sync-all-btn">
-                    🔄 Sync All Products
-                </button>
-            </form>
-        @endif
+        </form>
 
     </div>
 
-    {{-- Database Tables --}}
+
+    {{-- =========================================================
+         DATABASE GRID
+         ========================================================= --}}
+
     <div class="database-grid">
 
-        {{-- Primary Database --}}
-        <div class="database-card">
 
-            <div class="database-header primary-header">
-                <h2>Primary Database</h2>
+        {{-- =====================================================
+             PRIMARY DATABASE
+             ===================================================== --}}
 
-                <p>
-                    Connection:
-                    <strong>mysql</strong>
-                </p>
-            </div>
+        @if($database === 'all' || $database === 'mysql')
 
-            @if(isset($defaultProducts) && $defaultProducts->count() > 0)
+            <div class="database-card">
 
-                <div class="table-wrapper">
-                    <table>
+                <div class="database-header primary">
 
-                        <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Product</th>
-                            <th>Detail</th>
-                            <th>Action</th>
-                        </tr>
-                        </thead>
+                    <h2>
+                        Primary Database
+                    </h2>
 
-                        <tbody>
+                    <small>
+                        Connection: mysql
+                    </small>
 
-                        @foreach($defaultProducts as $product)
+                </div>
+
+
+                @if($primaryProducts->count() > 0)
+
+                    <div class="table-wrapper">
+
+                        <table>
+
+                            <thead>
 
                             <tr>
 
-                                <td>
-                                    <span class="id-badge">
+                                <th>
+                                    ID
+                                </th>
+
+                                <th>
+                                    Product
+                                </th>
+
+                                <th>
+                                    Detail
+                                </th>
+
+                                <th>
+                                    Sync
+                                </th>
+
+                                <th>
+                                    Actions
+                                </th>
+
+                            </tr>
+
+                            </thead>
+
+
+                            <tbody>
+
+                            @foreach($primaryProducts as $product)
+
+                                <tr>
+
+                                    <td>
                                         #{{ $product->id }}
+                                    </td>
+
+
+                                    <td>
+
+                                        <strong>
+                                            {{ $product->name }}
+                                        </strong>
+
+                                    </td>
+
+
+                                    <td>
+                                        {{ $product->detail ?? 'No detail' }}
+                                    </td>
+
+
+                                    <td>
+
+                                        @if($product->synced)
+
+                                            <span class="badge badge-success">
+                                                Synced
+                                            </span>
+
+                                        @else
+
+                                            <span class="badge badge-warning">
+                                                Pending
+                                            </span>
+
+                                        @endif
+
+                                    </td>
+
+
+                                    <td>
+
+                                        <div class="actions">
+
+
+                                            {{-- EDIT --}}
+
+                                            <a
+                                                href="{{ route(
+                                                    'products.edit',
+                                                    [
+                                                        'database' => 'mysql',
+                                                        'id' => $product->id
+                                                    ]
+                                                ) }}"
+                                                class="btn btn-warning"
+                                            >
+                                                Edit
+                                            </a>
+
+
+                                            {{-- SYNC --}}
+
+                                            @if(!$product->synced)
+
+                                                <form
+                                                    action="{{ route(
+                                                        'products.sync',
+                                                        $product->id
+                                                    ) }}"
+                                                    method="POST"
+                                                    onsubmit="return confirm('Synchronize this product to the secondary database?');"
+                                                >
+
+                                                    @csrf
+
+                                                    <button
+                                                        type="submit"
+                                                        class="btn btn-success"
+                                                    >
+                                                        Sync
+                                                    </button>
+
+                                                </form>
+
+                                            @endif
+
+
+                                            {{-- DELETE --}}
+
+                                            <form
+                                                action="{{ route(
+                                                    'products.destroy',
+                                                    [
+                                                        'database' => 'mysql',
+                                                        'id' => $product->id
+                                                    ]
+                                                ) }}"
+                                                method="POST"
+                                                onsubmit="return confirm('Are you sure you want to delete this product?');"
+                                            >
+
+                                                @csrf
+
+                                                @method('DELETE')
+
+                                                <button
+                                                    type="submit"
+                                                    class="btn btn-danger"
+                                                >
+                                                    Delete
+                                                </button>
+
+                                            </form>
+
+                                        </div>
+
+                                    </td>
+
+                                </tr>
+
+                            @endforeach
+
+                            </tbody>
+
+                        </table>
+
+                    </div>
+
+
+                    {{-- =================================================
+                         PRIMARY NUMERIC PAGINATION ONLY
+                         ================================================= --}}
+
+                    @if($primaryProducts->lastPage() > 1)
+
+                        <div class="pagination">
+
+                            @for(
+                                $page = 1;
+                                $page <= $primaryProducts->lastPage();
+                                $page++
+                            )
+
+                                @if($page == $primaryProducts->currentPage())
+
+                                    <span class="active">
+                                        {{ $page }}
                                     </span>
-                                </td>
 
-                                <td>
-                                    <div class="product-name">
-                                        {{ $product->name }}
-                                    </div>
-                                </td>
+                                @else
 
-                                <td>
-                                    <div class="detail">
-                                        {{ $product->detail ?? 'No detail available' }}
-                                    </div>
-                                </td>
-
-                                <td>
-
-                                    <form
-                                        action="{{ route('products.sync', $product->id) }}"
-                                        method="POST"
-                                        onsubmit="return confirm('Synchronize {{ addslashes($product->name) }} to the secondary database?');"
+                                    <a
+                                        href="{{ $primaryProducts->url($page) }}"
                                     >
+                                        {{ $page }}
+                                    </a>
 
-                                        @csrf
+                                @endif
 
-                                        <button
-                                            type="submit"
-                                            class="sync-btn"
-                                        >
-                                            Sync
-                                        </button>
+                            @endfor
 
-                                    </form>
+                        </div>
 
-                                </td>
+                    @endif
 
-                            </tr>
+                @else
 
-                        @endforeach
+                    <div class="empty">
 
-                        </tbody>
+                        No products found in Primary Database.
 
-                    </table>
-                </div>
+                    </div>
 
-            @else
+                @endif
 
-                <div class="empty-state">
-                    <strong>No Products Found</strong>
-                    There are no products available in the primary database.
-                </div>
-
-            @endif
-
-        </div>
-
-
-        {{-- Secondary Database --}}
-        <div class="database-card">
-
-            <div class="database-header secondary-header">
-                <h2>Secondary Database</h2>
-
-                <p>
-                    Connection:
-                    <strong>mysql_second</strong>
-                </p>
             </div>
 
-            @if(isset($secondProducts) && $secondProducts->count() > 0)
+        @endif
 
-                <div class="table-wrapper">
 
-                    <table>
+        {{-- =====================================================
+             SECONDARY DATABASE
+             ===================================================== --}}
 
-                        <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Product</th>
-                            <th>Detail</th>
-                        </tr>
-                        </thead>
+        @if($database === 'all' || $database === 'mysql_second')
 
-                        <tbody>
+            <div class="database-card">
 
-                        @foreach($secondProducts as $product)
+                <div class="database-header secondary">
+
+                    <h2>
+                        Secondary Database
+                    </h2>
+
+                    <small>
+                        Connection: mysql_second
+                    </small>
+
+                </div>
+
+
+                @if($secondaryProducts->count() > 0)
+
+                    <div class="table-wrapper">
+
+                        <table>
+
+                            <thead>
 
                             <tr>
 
-                                <td>
-                                    <span class="id-badge">
-                                        #{{ $product->id }}
-                                    </span>
-                                </td>
+                                <th>
+                                    ID
+                                </th>
 
-                                <td>
-                                    <div class="product-name">
-                                        {{ $product->name }}
-                                    </div>
-                                </td>
+                                <th>
+                                    Product
+                                </th>
 
-                                <td>
-                                    <div class="detail">
-                                        {{ $product->detail ?? 'No detail available' }}
-                                    </div>
-                                </td>
+                                <th>
+                                    Detail
+                                </th>
+
+                                <th>
+                                    Status
+                                </th>
+
+                                <th>
+                                    Actions
+                                </th>
 
                             </tr>
 
-                        @endforeach
-
-                        </tbody>
-
-                    </table>
-
-                </div>
-
-            @else
-
-                <div class="empty-state">
-                    <strong>No Products Found</strong>
-                    There are no products available in the secondary database.
-                </div>
-
-            @endif
-
-        </div>
-
-    </div>
+                            </thead>
 
 
-    {{-- Footer Information --}}
-    <div class="footer-note">
+                            <tbody>
 
-        <strong>How synchronization works:</strong>
+                            @foreach($secondaryProducts as $product)
 
-        <br>
+                                <tr>
 
-        1. Products are read from the primary
-        <strong>mysql</strong> database.
+                                    <td>
+                                        {{ $product->id }}
+                                    </td>
 
-        <br>
 
-        2. The system checks the secondary
-        <strong>mysql_second</strong> database using the product name.
+                                    <td>
 
-        <br>
+                                        <strong>
+                                            {{ $product->name }}
+                                        </strong>
 
-        3. If the product name already exists, the product is skipped.
+                                    </td>
 
-        <br>
 
-        4. If the product does not exist, it is inserted into the
-        secondary database.
+                                    <td>
+                                        {{ $product->detail ?? 'No detail' }}
+                                    </td>
 
-        <br>
 
-        5. The secondary database generates its own product ID,
-        so matching IDs between databases are not required.
+                                    <td>
+
+                                        @if($product->synced)
+
+                                            <span class="badge badge-success">
+                                                Matched
+                                            </span>
+
+                                        @else
+
+                                            <span class="badge badge-warning">
+                                                Secondary Only
+                                            </span>
+
+                                        @endif
+
+                                    </td>
+
+
+                                    <td>
+
+                                        <div class="actions">
+
+
+                                            {{-- EDIT --}}
+
+                                            <a
+                                                href="{{ route(
+                                                    'products.edit',
+                                                    [
+                                                        'database' => 'mysql_second',
+                                                        'id' => $product->id
+                                                    ]
+                                                ) }}"
+                                                class="btn btn-warning"
+                                            >
+                                                Edit
+                                            </a>
+
+
+                                            {{-- SYNC SECONDARY TO PRIMARY --}}
+
+                                            @if(!$product->synced)
+
+                                                <form
+                                                    action="{{ route(
+                                                        'products.sync-to-primary',
+                                                        $product->id
+                                                    ) }}"
+                                                    method="POST"
+                                                    onsubmit="return confirm('Synchronize this product to the primary database?');"
+                                                >
+
+                                                    @csrf
+
+                                                    <button
+                                                        type="submit"
+                                                        class="btn btn-success"
+                                                    >
+                                                        Sync to Primary
+                                                    </button>
+
+                                                </form>
+
+                                            @endif
+
+
+                                            {{-- DELETE --}}
+
+                                            <form
+                                                action="{{ route(
+                                                    'products.destroy',
+                                                    [
+                                                        'database' => 'mysql_second',
+                                                        'id' => $product->id
+                                                    ]
+                                                ) }}"
+                                                method="POST"
+                                                onsubmit="return confirm('Are you sure you want to delete this product?');"
+                                            >
+
+                                                @csrf
+
+                                                @method('DELETE')
+
+                                                <button
+                                                    type="submit"
+                                                    class="btn btn-danger"
+                                                >
+                                                    Delete
+                                                </button>
+
+                                            </form>
+
+                                        </div>
+
+                                    </td>
+
+                                </tr>
+
+                            @endforeach
+
+                            </tbody>
+
+                        </table>
+
+                    </div>
+
+
+                    {{-- =================================================
+                         SECONDARY NUMERIC PAGINATION ONLY
+                         ================================================= --}}
+
+                    @if($secondaryProducts->lastPage() > 1)
+
+                        <div class="pagination">
+
+                            @for(
+                                $page = 1;
+                                $page <= $secondaryProducts->lastPage();
+                                $page++
+                            )
+
+                                @if($page == $secondaryProducts->currentPage())
+
+                                    <span class="active">
+                                        {{ $page }}
+                                    </span>
+
+                                @else
+
+                                    <a
+                                        href="{{ $secondaryProducts->url($page) }}"
+                                    >
+                                        {{ $page }}
+                                    </a>
+
+                                @endif
+
+                            @endfor
+
+                        </div>
+
+                    @endif
+
+                @else
+
+                    <div class="empty">
+
+                        No products found in Secondary Database.
+
+                    </div>
+
+                @endif
+
+            </div>
+
+        @endif
 
     </div>
 
 </div>
 
 </body>
+
 </html>
