@@ -1,28 +1,86 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\DatabaseController;
 
 /*
 |--------------------------------------------------------------------------
-| Get Products from Default Database
+| Multi-Database Dashboard
 |--------------------------------------------------------------------------
 */
-Route::get('/get-mysql-products', function () {
-    $products = DB::table('products')->get();
-    dd($products);
+
+Route::get('/', function () {
+    return redirect()->route('dashboard');
 });
 
+Route::get('/dashboard', [
+    DatabaseController::class,
+    'dashboard'
+])->name('dashboard');
+
+
 /*
 |--------------------------------------------------------------------------
-| Get Products from Second Database
+| Products
 |--------------------------------------------------------------------------
 */
+
+Route::get('/products', [
+    ProductController::class,
+    'index'
+])->name('products.index');
+
+
+/*
+|--------------------------------------------------------------------------
+| Synchronization
+|--------------------------------------------------------------------------
+*/
+
+Route::post('/products/{id}/sync', [
+    DatabaseController::class,
+    'syncProduct'
+])->name('products.sync');
+
+Route::post('/products/sync-all', [
+    DatabaseController::class,
+    'syncAll'
+])->name('products.sync-all');
+
+
+/*
+|--------------------------------------------------------------------------
+| Database Health Monitor
+|--------------------------------------------------------------------------
+*/
+
+Route::get('/database-health', [
+    DatabaseController::class,
+    'health'
+])->name('database.health');
+
+
+/*
+|--------------------------------------------------------------------------
+| Original Testing Routes
+|--------------------------------------------------------------------------
+*/
+
+Route::get('/get-mysql-products', function () {
+    $products = DB::connection('mysql')
+        ->table('products')
+        ->get();
+
+    return response()->json($products);
+});
+
+
 Route::get('/get-mysql-second-products', function () {
     $products = DB::connection('mysql_second')
-                  ->table('products')
-                  ->get();
+        ->table('products')
+        ->get();
 
-    dd($products);
+    return response()->json($products);
 });
