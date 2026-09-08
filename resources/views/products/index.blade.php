@@ -1,985 +1,211 @@
-<!DOCTYPE html>
-<html lang="en">
+@extends('layouts.app')
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+@section('title', 'Product Management')
 
-    <title>Product Manager</title>
+@section('page-title', 'Product Management')
 
-    <style>
-        * {
-            box-sizing: border-box;
-        }
-
-        body {
-            margin: 0;
-            font-family: Arial, sans-serif;
-            background: #f4f6f9;
-            color: #1f2937;
-        }
-
-        .navbar {
-            background: #111827;
-            padding: 18px 40px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .navbar h2 {
-            color: white;
-            margin: 0;
-        }
-
-        .nav-links a {
-            color: #d1d5db;
-            text-decoration: none;
-            margin-left: 20px;
-        }
-
-        .nav-links a:hover {
-            color: white;
-        }
-
-        .container {
-            max-width: 1400px;
-            margin: 35px auto;
-            padding: 0 20px;
-        }
-
-        .header {
-            margin-bottom: 25px;
-        }
-
-        .header h1 {
-            margin-bottom: 8px;
-        }
-
-        .header p {
-            color: #6b7280;
-        }
-
-        .stats {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 20px;
-            margin-bottom: 25px;
-        }
-
-        .stat {
-            background: white;
-            padding: 20px;
-            border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, .06);
-        }
-
-        .stat h3 {
-            margin: 0;
-            color: #6b7280;
-            font-size: 14px;
-        }
-
-        .stat .number {
-            font-size: 30px;
-            font-weight: bold;
-            margin-top: 8px;
-        }
-
-        .toolbar {
-            background: white;
-            padding: 20px;
-            border-radius: 12px;
-            margin-bottom: 25px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, .06);
-        }
-
-        .filters {
-            display: grid;
-            grid-template-columns: 2fr 1fr 1fr auto auto;
-            gap: 12px;
-        }
-
-        input,
-        select {
-            width: 100%;
-            padding: 11px;
-            border: 1px solid #d1d5db;
-            border-radius: 7px;
-            background: white;
-        }
-
-        .btn {
-            border: none;
-            padding: 11px 17px;
-            border-radius: 7px;
-            text-decoration: none;
-            cursor: pointer;
-            font-size: 14px;
-            display: inline-block;
-        }
-
-        .btn-primary {
-            background: #2563eb;
-            color: white;
-        }
-
-        .btn-success {
-            background: #16a34a;
-            color: white;
-        }
-
-        .btn-warning {
-            background: #d97706;
-            color: white;
-        }
-
-        .btn-danger {
-            background: #dc2626;
-            color: white;
-        }
-
-        .btn-secondary {
-            background: #6b7280;
-            color: white;
-        }
-
-        .btn:hover {
-            opacity: .9;
-        }
-
-        .alert {
-            padding: 14px 18px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-        }
-
-        .success {
-            background: #dcfce7;
-            color: #166534;
-            border: 1px solid #bbf7d0;
-        }
-
-        .warning {
-            background: #fef3c7;
-            color: #92400e;
-            border: 1px solid #fde68a;
-        }
-
-        .error {
-            background: #fee2e2;
-            color: #991b1b;
-            border: 1px solid #fecaca;
-        }
-
-        .info {
-            background: #dbeafe;
-            color: #1e40af;
-            border: 1px solid #bfdbfe;
-        }
-
-        .database-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 25px;
-        }
-
-        .database-card {
-            background: white;
-            border-radius: 12px;
-            overflow: hidden;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, .06);
-        }
-
-        .database-header {
-            padding: 18px 20px;
-            color: white;
-        }
-
-        .primary {
-            background: #2563eb;
-        }
-
-        .secondary {
-            background: #059669;
-        }
-
-        .database-header h2 {
-            margin: 0 0 5px;
-        }
-
-        .table-wrapper {
-            overflow-x: auto;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        th,
-        td {
-            padding: 12px;
-            border-bottom: 1px solid #e5e7eb;
-            text-align: left;
-        }
-
-        th {
-            background: #f9fafb;
-        }
-
-        .badge {
-            padding: 5px 9px;
-            border-radius: 20px;
-            font-size: 11px;
-            font-weight: bold;
-            display: inline-block;
-        }
-
-        .badge-success {
-            background: #dcfce7;
-            color: #166534;
-        }
-
-        .badge-warning {
-            background: #fef3c7;
-            color: #92400e;
-        }
-
-        .actions {
-            display: flex;
-            gap: 6px;
-            flex-wrap: wrap;
-        }
-
-        .actions .btn {
-            padding: 7px 10px;
-            font-size: 12px;
-        }
-
-        /*
-        |--------------------------------------------------------------------------
-        | Numeric Pagination Only
-        |--------------------------------------------------------------------------
-        */
-
-        .pagination {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 6px;
-            padding: 20px;
-        }
-
-        .pagination a,
-        .pagination span {
-            min-width: 36px;
-            height: 36px;
-            padding: 8px 11px;
-            border: 1px solid #d1d5db;
-            border-radius: 6px;
-            text-align: center;
-            text-decoration: none;
-            color: #374151;
-            background: white;
-            font-size: 14px;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .pagination a:hover {
-            background: #2563eb;
-            color: white;
-            border-color: #2563eb;
-        }
-
-        .pagination .active {
-            background: #2563eb;
-            color: white;
-            border-color: #2563eb;
-            font-weight: bold;
-        }
-
-        .empty {
-            padding: 35px;
-            text-align: center;
-            color: #6b7280;
-        }
-
-        .section-title {
-            padding: 20px 20px 0;
-        }
-
-        .action-bar {
-            margin-bottom: 20px;
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-        }
-
-        @media(max-width: 1000px) {
-
-            .stats {
-                grid-template-columns: repeat(2, 1fr);
-            }
-
-            .database-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .filters {
-                grid-template-columns: 1fr 1fr;
-            }
-        }
-
-        @media(max-width: 600px) {
-
-            .stats {
-                grid-template-columns: 1fr;
-            }
-
-            .filters {
-                grid-template-columns: 1fr;
-            }
-
-            .navbar {
-                flex-direction: column;
-                gap: 12px;
-                padding: 15px 20px;
-            }
-
-            .nav-links a {
-                margin: 0 6px;
-            }
-        }
-    </style>
-</head>
-
-<body>
-
-<nav class="navbar">
-
-    <h2>
-        Multi-Database Manager
-    </h2>
-
-    <div class="nav-links">
-
-        <a href="{{ route('dashboard') }}">
-            Dashboard
-        </a>
-
-        <a href="{{ route('products.index') }}">
-            Products
-        </a>
-
-        <a href="{{ route('database.health') }}">
-            Health Monitor
-        </a>
-
-    </div>
-
-</nav>
-
-
-<div class="container">
-
-    <div class="header">
-
-        <h1>
-            Product Management
-        </h1>
-
-        <p>
-            Manage products stored in both MySQL databases.
-        </p>
-
-    </div>
-
-
-    {{-- =========================================================
-         SUCCESS MESSAGE
-         ========================================================= --}}
+@section('content')
 
     @if(session('success'))
-
-        <div class="alert success">
-
-            <strong>Success:</strong>
-
-            {{ session('success') }}
-
-        </div>
-
+        <x-alert type="success" class="mb-6">{{ session('success') }}</x-alert>
     @endif
-
-
-    {{-- =========================================================
-         CREATE SUCCESS
-         ========================================================= --}}
 
     @if(session('created'))
-
-        <div class="alert success">
-
-            <strong>Product Created:</strong>
-
-            {{ session('created') }}
-
-        </div>
-
+        <x-alert type="success" class="mb-6">{{ session('created') }}</x-alert>
     @endif
-
-
-    {{-- =========================================================
-         UPDATE SUCCESS
-         ========================================================= --}}
 
     @if(session('updated'))
-
-        <div class="alert success">
-
-            <strong>Product Updated:</strong>
-
-            {{ session('updated') }}
-
-        </div>
-
+        <x-alert type="success" class="mb-6">{{ session('updated') }}</x-alert>
     @endif
-
-
-    {{-- =========================================================
-         DELETE SUCCESS
-         ========================================================= --}}
 
     @if(session('deleted'))
-
-        <div class="alert success">
-
-            <strong>Product Deleted:</strong>
-
-            {{ session('deleted') }}
-
-        </div>
-
+        <x-alert type="success" class="mb-6">{{ session('deleted') }}</x-alert>
     @endif
-
-
-    {{-- =========================================================
-         SYNC SUCCESS
-         ========================================================= --}}
 
     @if(session('synced'))
-
-        <div class="alert success">
-
-            <strong>Synchronization Successful:</strong>
-
-            {{ session('synced') }}
-
-        </div>
-
+        <x-alert type="success" class="mb-6">{{ session('synced') }}</x-alert>
     @endif
-
-
-    {{-- =========================================================
-         WARNING MESSAGE
-         ========================================================= --}}
 
     @if(session('warning'))
-
-        <div class="alert warning">
-
-            <strong>Warning:</strong>
-
-            {{ session('warning') }}
-
-        </div>
-
+        <x-alert type="warning" class="mb-6">{{ session('warning') }}</x-alert>
     @endif
-
-
-    {{-- =========================================================
-         ERROR MESSAGE
-         ========================================================= --}}
 
     @if(session('error'))
-
-        <div class="alert error">
-
-            <strong>Error:</strong>
-
-            {{ session('error') }}
-
-        </div>
-
+        <x-alert type="danger" class="mb-6">{{ session('error') }}</x-alert>
     @endif
-
-
-    {{-- =========================================================
-         VALIDATION ERRORS
-         ========================================================= --}}
 
     @if($errors->any())
-
-        <div class="alert error">
-
-            <strong>Please fix the following errors:</strong>
-
-            <ul style="margin-bottom:0;">
-
+        <x-alert type="danger" class="mb-6">
+            <ul class="list-disc list-inside space-y-1">
                 @foreach($errors->all() as $error)
-
-                    <li>
-                        {{ $error }}
-                    </li>
-
+                    <li>{{ $error }}</li>
                 @endforeach
-
             </ul>
-
-        </div>
-
+        </x-alert>
     @endif
 
+    {{-- Statistics --}}
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-6 sm:mb-8">
 
-    {{-- =========================================================
-         STATISTICS
-         ========================================================= --}}
-
-    <div class="stats">
-
-        <div class="stat">
-
-            <h3>
-                Primary Products
-            </h3>
-
-            <div class="number">
-                {{ $primaryTotal }}
-            </div>
-
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-4 sm:p-6">
+            <h3 class="text-sm font-medium text-gray-500 dark:text-gray-400">Primary Products</h3>
+            <p class="mt-2 text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">{{ $primaryTotal }}</p>
         </div>
 
-
-        <div class="stat">
-
-            <h3>
-                Secondary Products
-            </h3>
-
-            <div class="number">
-                {{ $secondaryTotal }}
-            </div>
-
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-4 sm:p-6">
+            <h3 class="text-sm font-medium text-gray-500 dark:text-gray-400">Secondary Products</h3>
+            <p class="mt-2 text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">{{ $secondaryTotal }}</p>
         </div>
 
-
-        <div class="stat">
-
-            <h3>
-                Synchronized
-            </h3>
-
-            <div class="number">
-                {{ $syncedCount }}
-            </div>
-
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-4 sm:p-6">
+            <h3 class="text-sm font-medium text-gray-500 dark:text-gray-400">Synchronized</h3>
+            <p class="mt-2 text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">{{ $syncedCount }}</p>
         </div>
 
-
-        <div class="stat">
-
-            <h3>
-                Pending Sync
-            </h3>
-
-            <div class="number">
-                {{ max(0, $primaryTotal - $syncedCount) }}
-            </div>
-
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-4 sm:p-6">
+            <h3 class="text-sm font-medium text-gray-500 dark:text-gray-400">Pending Sync</h3>
+            <p class="mt-2 text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">{{ max(0, $primaryTotal - $syncedCount) }}</p>
         </div>
 
     </div>
 
+    {{-- Search / Filter / Sort --}}
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-4 sm:p-6 mb-6">
+        <form method="GET" action="{{ route('products.index') }}">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 sm:gap-4">
+                <div class="lg:col-span-2">
+                    <input type="text" name="search" value="{{ $search }}" placeholder="Search product name or detail..." class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white text-sm focus:border-primary focus:ring-primary shadow-sm">
+                </div>
 
-    {{-- =========================================================
-         SEARCH / FILTER / SORT
-         ========================================================= --}}
+                <div>
+                    <select name="database" class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white text-sm focus:border-primary focus:ring-primary shadow-sm">
+                        <option value="all" {{ $database === 'all' ? 'selected' : '' }}>All Databases</option>
+                        <option value="mysql" {{ $database === 'mysql' ? 'selected' : '' }}>Primary Database</option>
+                        <option value="mysql_second" {{ $database === 'mysql_second' ? 'selected' : '' }}>Secondary Database</option>
+                    </select>
+                </div>
 
-    <div class="toolbar">
+                <div>
+                    <select name="sort" class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white text-sm focus:border-primary focus:ring-primary shadow-sm">
+                        <option value="newest" {{ $sort === 'newest' ? 'selected' : '' }}>Newest</option>
+                        <option value="oldest" {{ $sort === 'oldest' ? 'selected' : '' }}>Oldest</option>
+                        <option value="name_asc" {{ $sort === 'name_asc' ? 'selected' : '' }}>Name A-Z</option>
+                        <option value="name_desc" {{ $sort === 'name_desc' ? 'selected' : '' }}>Name Z-A</option>
+                    </select>
+                </div>
 
-        <form
-            method="GET"
-            action="{{ route('products.index') }}"
-        >
-
-            <div class="filters">
-
-                <input
-                    type="text"
-                    name="search"
-                    value="{{ $search }}"
-                    placeholder="Search product name or detail..."
-                >
-
-
-                <select name="database">
-
-                    <option
-                        value="all"
-                        {{ $database === 'all' ? 'selected' : '' }}
-                    >
-                        All Databases
-                    </option>
-
-                    <option
-                        value="mysql"
-                        {{ $database === 'mysql' ? 'selected' : '' }}
-                    >
-                        Primary Database
-                    </option>
-
-                    <option
-                        value="mysql_second"
-                        {{ $database === 'mysql_second' ? 'selected' : '' }}
-                    >
-                        Secondary Database
-                    </option>
-
-                </select>
-
-
-                <select name="sort">
-
-                    <option
-                        value="newest"
-                        {{ $sort === 'newest' ? 'selected' : '' }}
-                    >
-                        Newest
-                    </option>
-
-                    <option
-                        value="oldest"
-                        {{ $sort === 'oldest' ? 'selected' : '' }}
-                    >
-                        Oldest
-                    </option>
-
-                    <option
-                        value="name_asc"
-                        {{ $sort === 'name_asc' ? 'selected' : '' }}
-                    >
-                        Name A-Z
-                    </option>
-
-                    <option
-                        value="name_desc"
-                        {{ $sort === 'name_desc' ? 'selected' : '' }}
-                    >
-                        Name Z-A
-                    </option>
-
-                </select>
-
-
-                <button
-                    type="submit"
-                    class="btn btn-primary"
-                >
-                    Search
-                </button>
-
-
-                <a
-                    href="{{ route('products.index') }}"
-                    class="btn btn-secondary"
-                >
-                    Reset
-                </a>
-
+                <div class="flex gap-2">
+                    <button type="submit" class="flex-1 inline-flex items-center justify-center px-4 py-2 bg-primary hover:bg-primary-dark text-white text-sm font-medium rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2">
+                        Search
+                    </button>
+                    <a href="{{ route('products.index') }}" class="inline-flex items-center justify-center px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white text-sm font-medium rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2">
+                        Reset
+                    </a>
+                </div>
             </div>
-
         </form>
-
     </div>
 
-
-    {{-- =========================================================
-         ACTION BUTTONS
-         ========================================================= --}}
-
-    <div class="action-bar">
-
-        <a
-            href="{{ route('products.create') }}"
-            class="btn btn-success"
-        >
+    {{-- Action Buttons --}}
+    <div class="flex flex-wrap gap-3 mb-6">
+        <a href="{{ route('products.create') }}" class="inline-flex items-center justify-center px-4 py-2 bg-green-600 hover:bg-green-700 text-white text-sm font-medium rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2">
             + Add Product
         </a>
 
-
-        <form
-            action="{{ route('products.sync-all') }}"
-            method="POST"
-            style="display:inline;"
-            onsubmit="return confirm('Synchronize all primary products to secondary database?');"
-        >
-
+        <form action="{{ route('products.sync-all') }}" method="POST" onsubmit="return confirm('Synchronize all primary products to secondary database?')" class="inline">
             @csrf
-
-            <button
-                type="submit"
-                class="btn btn-primary"
-            >
+            <button type="submit" class="inline-flex items-center justify-center px-4 py-2 bg-primary hover:bg-primary-dark text-white text-sm font-medium rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2">
                 Sync All Products
             </button>
-
         </form>
-
     </div>
 
-
-    {{-- =========================================================
-         DATABASE GRID
-         ========================================================= --}}
-
-    <div class="database-grid">
-
-
-        {{-- =====================================================
-             PRIMARY DATABASE
-             ===================================================== --}}
+    {{-- Database Grid --}}
+    <div class="grid grid-cols-1 xl:grid-cols-2 gap-6">
 
         @if($database === 'all' || $database === 'mysql')
 
-            <div class="database-card">
-
-                <div class="database-header primary">
-
-                    <h2>
-                        Primary Database
-                    </h2>
-
-                    <small>
-                        Connection: mysql
-                    </small>
-
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
+                <div class="bg-primary px-4 sm:px-6 py-4">
+                    <h2 class="text-lg font-semibold text-white">Primary Database</h2>
+                    <small class="text-blue-100">Connection: mysql</small>
                 </div>
-
 
                 @if($primaryProducts->count() > 0)
 
-                    <div class="table-wrapper">
-
-                        <table>
-
-                            <thead>
-
-                            <tr>
-
-                                <th>
-                                    ID
-                                </th>
-
-                                <th>
-                                    Product
-                                </th>
-
-                                <th>
-                                    Detail
-                                </th>
-
-                                <th>
-                                    Sync
-                                </th>
-
-                                <th>
-                                    Actions
-                                </th>
-
-                            </tr>
-
-                            </thead>
-
-
-                            <tbody>
-
-                            @foreach($primaryProducts as $product)
-
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                            <thead class="bg-gray-50 dark:bg-gray-700">
                                 <tr>
+                                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">ID</th>
+                                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Product</th>
+                                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Detail</th>
+                                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Sync</th>
+                                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                                @foreach($primaryProducts as $product)
+                                    <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
+                                        <td class="px-4 py-3 text-sm text-gray-900 dark:text-white">#{{ $product->id }}</td>
+                                        <td class="px-4 py-3 text-sm font-medium text-gray-900 dark:text-white">{{ $product->name }}</td>
+                                        <td class="px-4 py-3 text-sm text-gray-500 dark:text-gray-400">{{ $product->detail ?? 'No detail' }}</td>
+                                        <td class="px-4 py-3 text-sm">
+                                            @if($product->synced)
+                                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
+                                                    Synced
+                                                </span>
+                                            @else
+                                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-200">
+                                                    Pending
+                                                </span>
+                                            @endif
+                                        </td>
+                                        <td class="px-4 py-3 text-sm">
+                                            <div class="flex flex-wrap gap-2">
 
-                                    <td>
-                                        #{{ $product->id }}
-                                    </td>
+                                                <a href="{{ route('products.edit', ['database' => 'mysql', 'id' => $product->id]) }}" class="inline-flex items-center justify-center px-2.5 py-1.5 bg-amber-500 hover:bg-amber-600 text-white text-xs font-medium rounded transition-colors focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2">
+                                                    Edit
+                                                </a>
 
+                                                @if(!$product->synced)
+                                                    <form action="{{ route('products.sync', $product->id) }}" method="POST" onsubmit="return confirm('Synchronize this product to the secondary database?')" class="inline">
+                                                        @csrf
+                                                        <button type="submit" class="inline-flex items-center justify-center px-2.5 py-1.5 bg-green-600 hover:bg-green-700 text-white text-xs font-medium rounded transition-colors focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2">
+                                                            Sync
+                                                        </button>
+                                                    </form>
+                                                @endif
 
-                                    <td>
-
-                                        <strong>
-                                            {{ $product->name }}
-                                        </strong>
-
-                                    </td>
-
-
-                                    <td>
-                                        {{ $product->detail ?? 'No detail' }}
-                                    </td>
-
-
-                                    <td>
-
-                                        @if($product->synced)
-
-                                            <span class="badge badge-success">
-                                                Synced
-                                            </span>
-
-                                        @else
-
-                                            <span class="badge badge-warning">
-                                                Pending
-                                            </span>
-
-                                        @endif
-
-                                    </td>
-
-
-                                    <td>
-
-                                        <div class="actions">
-
-
-                                            {{-- EDIT --}}
-
-                                            <a
-                                                href="{{ route(
-                                                    'products.edit',
-                                                    [
-                                                        'database' => 'mysql',
-                                                        'id' => $product->id
-                                                    ]
-                                                ) }}"
-                                                class="btn btn-warning"
-                                            >
-                                                Edit
-                                            </a>
-
-
-                                            {{-- SYNC --}}
-
-                                            @if(!$product->synced)
-
-                                                <form
-                                                    action="{{ route(
-                                                        'products.sync',
-                                                        $product->id
-                                                    ) }}"
-                                                    method="POST"
-                                                    onsubmit="return confirm('Synchronize this product to the secondary database?');"
-                                                >
-
+                                                <form action="{{ route('products.destroy', ['database' => 'mysql', 'id' => $product->id]) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this product?')" class="inline">
                                                     @csrf
-
-                                                    <button
-                                                        type="submit"
-                                                        class="btn btn-success"
-                                                    >
-                                                        Sync
+                                                    @method('DELETE')
+                                                    <button type="submit" class="inline-flex items-center justify-center px-2.5 py-1.5 bg-red-600 hover:bg-red-700 text-white text-xs font-medium rounded transition-colors focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2">
+                                                        Delete
                                                     </button>
-
                                                 </form>
 
-                                            @endif
-
-
-                                            {{-- DELETE --}}
-
-                                            <form
-                                                action="{{ route(
-                                                    'products.destroy',
-                                                    [
-                                                        'database' => 'mysql',
-                                                        'id' => $product->id
-                                                    ]
-                                                ) }}"
-                                                method="POST"
-                                                onsubmit="return confirm('Are you sure you want to delete this product?');"
-                                            >
-
-                                                @csrf
-
-                                                @method('DELETE')
-
-                                                <button
-                                                    type="submit"
-                                                    class="btn btn-danger"
-                                                >
-                                                    Delete
-                                                </button>
-
-                                            </form>
-
-                                        </div>
-
-                                    </td>
-
-                                </tr>
-
-                            @endforeach
-
+                                            </div>
+                                        </td>
+                                    </tr>
+                                @endforeach
                             </tbody>
-
                         </table>
-
                     </div>
 
-
-                    {{-- =================================================
-                         PRIMARY NUMERIC PAGINATION ONLY
-                         ================================================= --}}
-
                     @if($primaryProducts->lastPage() > 1)
-
-                        <div class="pagination">
-
-                            @for(
-                                $page = 1;
-                                $page <= $primaryProducts->lastPage();
-                                $page++
-                            )
-
-                                @if($page == $primaryProducts->currentPage())
-
-                                    <span class="active">
-                                        {{ $page }}
-                                    </span>
-
-                                @else
-
-                                    <a
-                                        href="{{ $primaryProducts->url($page) }}"
-                                    >
-                                        {{ $page }}
-                                    </a>
-
-                                @endif
-
-                            @endfor
-
+                        <div class="border-t border-gray-200 dark:border-gray-700 px-4 py-3">
+                            <x-pagination :paginator="$primaryProducts" />
                         </div>
-
                     @endif
 
                 @else
 
-                    <div class="empty">
-
-                        No products found in Primary Database.
-
+                    <div class="text-center py-12">
+                        <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"/>
+                        </svg>
+                        <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">No products found in Primary Database.</p>
                     </div>
 
                 @endif
@@ -988,239 +214,89 @@
 
         @endif
 
-
-        {{-- =====================================================
-             SECONDARY DATABASE
-             ===================================================== --}}
-
         @if($database === 'all' || $database === 'mysql_second')
 
-            <div class="database-card">
-
-                <div class="database-header secondary">
-
-                    <h2>
-                        Secondary Database
-                    </h2>
-
-                    <small>
-                        Connection: mysql_second
-                    </small>
-
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
+                <div class="bg-secondary px-4 sm:px-6 py-4">
+                    <h2 class="text-lg font-semibold text-white">Secondary Database</h2>
+                    <small class="text-green-100">Connection: mysql_second</small>
                 </div>
-
 
                 @if($secondaryProducts->count() > 0)
 
-                    <div class="table-wrapper">
-
-                        <table>
-
-                            <thead>
-
-                            <tr>
-
-                                <th>
-                                    ID
-                                </th>
-
-                                <th>
-                                    Product
-                                </th>
-
-                                <th>
-                                    Detail
-                                </th>
-
-                                <th>
-                                    Status
-                                </th>
-
-                                <th>
-                                    Actions
-                                </th>
-
-                            </tr>
-
-                            </thead>
-
-
-                            <tbody>
-
-                            @foreach($secondaryProducts as $product)
-
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                            <thead class="bg-gray-50 dark:bg-gray-700">
                                 <tr>
+                                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">ID</th>
+                                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Product</th>
+                                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Detail</th>
+                                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Status</th>
+                                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                                @foreach($secondaryProducts as $product)
+                                    <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
+                                        <td class="px-4 py-3 text-sm text-gray-900 dark:text-white">{{ $product->id }}</td>
+                                        <td class="px-4 py-3 text-sm font-medium text-gray-900 dark:text-white">{{ $product->name }}</td>
+                                        <td class="px-4 py-3 text-sm text-gray-500 dark:text-gray-400">{{ $product->detail ?? 'No detail' }}</td>
+                                        <td class="px-4 py-3 text-sm">
+                                            @if($product->synced)
+                                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
+                                                    Matched
+                                                </span>
+                                            @else
+                                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-200">
+                                                    Secondary Only
+                                                </span>
+                                            @endif
+                                        </td>
+                                        <td class="px-4 py-3 text-sm">
+                                            <div class="flex flex-wrap gap-2">
 
-                                    <td>
-                                        {{ $product->id }}
-                                    </td>
+                                                <a href="{{ route('products.edit', ['database' => 'mysql_second', 'id' => $product->id]) }}" class="inline-flex items-center justify-center px-2.5 py-1.5 bg-amber-500 hover:bg-amber-600 text-white text-xs font-medium rounded transition-colors focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2">
+                                                    Edit
+                                                </a>
 
+                                                @if(!$product->synced)
+                                                    <form action="{{ route('products.sync-to-primary', $product->id) }}" method="POST" onsubmit="return confirm('Synchronize this product to the primary database?')" class="inline">
+                                                        @csrf
+                                                        <button type="submit" class="inline-flex items-center justify-center px-2.5 py-1.5 bg-green-600 hover:bg-green-700 text-white text-xs font-medium rounded transition-colors focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2">
+                                                            Sync to Primary
+                                                        </button>
+                                                    </form>
+                                                @endif
 
-                                    <td>
-
-                                        <strong>
-                                            {{ $product->name }}
-                                        </strong>
-
-                                    </td>
-
-
-                                    <td>
-                                        {{ $product->detail ?? 'No detail' }}
-                                    </td>
-
-
-                                    <td>
-
-                                        @if($product->synced)
-
-                                            <span class="badge badge-success">
-                                                Matched
-                                            </span>
-
-                                        @else
-
-                                            <span class="badge badge-warning">
-                                                Secondary Only
-                                            </span>
-
-                                        @endif
-
-                                    </td>
-
-
-                                    <td>
-
-                                        <div class="actions">
-
-
-                                            {{-- EDIT --}}
-
-                                            <a
-                                                href="{{ route(
-                                                    'products.edit',
-                                                    [
-                                                        'database' => 'mysql_second',
-                                                        'id' => $product->id
-                                                    ]
-                                                ) }}"
-                                                class="btn btn-warning"
-                                            >
-                                                Edit
-                                            </a>
-
-
-                                            {{-- SYNC SECONDARY TO PRIMARY --}}
-
-                                            @if(!$product->synced)
-
-                                                <form
-                                                    action="{{ route(
-                                                        'products.sync-to-primary',
-                                                        $product->id
-                                                    ) }}"
-                                                    method="POST"
-                                                    onsubmit="return confirm('Synchronize this product to the primary database?');"
-                                                >
-
+                                                <form action="{{ route('products.destroy', ['database' => 'mysql_second', 'id' => $product->id]) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this product?')" class="inline">
                                                     @csrf
-
-                                                    <button
-                                                        type="submit"
-                                                        class="btn btn-success"
-                                                    >
-                                                        Sync to Primary
+                                                    @method('DELETE')
+                                                    <button type="submit" class="inline-flex items-center justify-center px-2.5 py-1.5 bg-red-600 hover:bg-red-700 text-white text-xs font-medium rounded transition-colors focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2">
+                                                        Delete
                                                     </button>
-
                                                 </form>
 
-                                            @endif
-
-
-                                            {{-- DELETE --}}
-
-                                            <form
-                                                action="{{ route(
-                                                    'products.destroy',
-                                                    [
-                                                        'database' => 'mysql_second',
-                                                        'id' => $product->id
-                                                    ]
-                                                ) }}"
-                                                method="POST"
-                                                onsubmit="return confirm('Are you sure you want to delete this product?');"
-                                            >
-
-                                                @csrf
-
-                                                @method('DELETE')
-
-                                                <button
-                                                    type="submit"
-                                                    class="btn btn-danger"
-                                                >
-                                                    Delete
-                                                </button>
-
-                                            </form>
-
-                                        </div>
-
-                                    </td>
-
-                                </tr>
-
-                            @endforeach
-
+                                            </div>
+                                        </td>
+                                    </tr>
+                                @endforeach
                             </tbody>
-
                         </table>
-
                     </div>
 
-
-                    {{-- =================================================
-                         SECONDARY NUMERIC PAGINATION ONLY
-                         ================================================= --}}
-
                     @if($secondaryProducts->lastPage() > 1)
-
-                        <div class="pagination">
-
-                            @for(
-                                $page = 1;
-                                $page <= $secondaryProducts->lastPage();
-                                $page++
-                            )
-
-                                @if($page == $secondaryProducts->currentPage())
-
-                                    <span class="active">
-                                        {{ $page }}
-                                    </span>
-
-                                @else
-
-                                    <a
-                                        href="{{ $secondaryProducts->url($page) }}"
-                                    >
-                                        {{ $page }}
-                                    </a>
-
-                                @endif
-
-                            @endfor
-
+                        <div class="border-t border-gray-200 dark:border-gray-700 px-4 py-3">
+                            <x-pagination :paginator="$secondaryProducts" />
                         </div>
-
                     @endif
 
                 @else
 
-                    <div class="empty">
-
-                        No products found in Secondary Database.
-
+                    <div class="text-center py-12">
+                        <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"/>
+                        </svg>
+                        <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">No products found in Secondary Database.</p>
                     </div>
 
                 @endif
@@ -1231,8 +307,4 @@
 
     </div>
 
-</div>
-
-</body>
-
-</html>
+@endsection
