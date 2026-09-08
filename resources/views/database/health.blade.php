@@ -1,362 +1,97 @@
-<!DOCTYPE html>
-<html lang="en">
+@extends('layouts.app')
 
-<head>
+@section('title', 'Database Health Monitor')
 
-    <meta charset="UTF-8">
+@section('page-title', 'Database Health Monitor')
 
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
+@section('content')
 
-    <title>Database Health Monitor</title>
-
-    <style>
-
-        * {
-            box-sizing: border-box;
-        }
-
-        body {
-            margin: 0;
-            font-family: Arial, sans-serif;
-            background: #f4f6f9;
-            color: #1f2937;
-        }
-
-        .navbar {
-            background: #111827;
-            padding: 18px 40px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .navbar h2 {
-            color: white;
-            margin: 0;
-        }
-
-        .navbar a {
-            color: #d1d5db;
-            text-decoration: none;
-            margin-left: 20px;
-        }
-
-        .container {
-            max-width: 1200px;
-            margin: 35px auto;
-            padding: 0 20px;
-        }
-
-        .header {
-            margin-bottom: 25px;
-        }
-
-        .header h1 {
-            margin-bottom: 8px;
-        }
-
-        .header p {
-            color: #6b7280;
-        }
-
-        .grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 25px;
-        }
-
-        .card {
-            background: white;
-            border-radius: 12px;
-            padding: 25px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, .06);
-        }
-
-        .card h2 {
-            margin-top: 0;
-        }
-
-        .status {
-            display: inline-block;
-            padding: 7px 13px;
-            border-radius: 20px;
-            font-size: 13px;
-            font-weight: bold;
-        }
-
-        .success {
-            background: #dcfce7;
-            color: #166534;
-        }
-
-        .danger {
-            background: #fee2e2;
-            color: #991b1b;
-        }
-
-        .info {
-            display: grid;
-            grid-template-columns: 150px 1fr;
-            row-gap: 14px;
-            margin-top: 20px;
-        }
-
-        .label {
-            font-weight: bold;
-            color: #6b7280;
-        }
-
-        .table-status {
-            padding: 5px 10px;
-            border-radius: 15px;
-            font-size: 12px;
-        }
-
-        .btn {
-            display: inline-block;
-            padding: 10px 16px;
-            background: #2563eb;
-            color: white;
-            text-decoration: none;
-            border-radius: 7px;
-            border: none;
-            cursor: pointer;
-        }
-
-        .error {
-            background: #fff1f2;
-            color: #9f1239;
-            padding: 12px;
-            border-radius: 7px;
-            margin-top: 20px;
-            word-break: break-word;
-            font-size: 13px;
-        }
-
-        .response {
-            font-size: 24px;
-            font-weight: bold;
-        }
-
-        @media(max-width: 850px) {
-            .grid {
-                grid-template-columns: 1fr;
-            }
-
-            .navbar {
-                padding: 15px 20px;
-                flex-direction: column;
-                gap: 12px;
-            }
-        }
-
-    </style>
-
-</head>
-
-<body>
-
-<nav class="navbar">
-
-    <h2>Multi-Database Manager</h2>
-
-    <div>
-
-        <a href="{{ route('dashboard') }}">
-            Dashboard
-        </a>
-
-        <a href="{{ route('products.index') }}">
-            Products
-        </a>
-
-        <a href="{{ route('database.health') }}">
-            Health Monitor
-        </a>
-
-    </div>
-
-</nav>
-
-
-<div class="container">
-
-    <div class="header">
-
-        <h1>
-            Database Connection Health Monitor
-        </h1>
-
-        <p>
-            Test the health and availability of every configured database.
-        </p>
-
-        <a
-            href="{{ route('database.health') }}"
-            class="btn"
-        >
+    <div class="mb-6">
+        <a href="{{ route('database.health') }}" class="inline-flex items-center justify-center px-4 py-2 bg-primary hover:bg-primary-dark text-white text-sm font-medium rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2">
             Run Health Check Again
         </a>
-
     </div>
 
-
-    <div class="grid">
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
 
         @foreach($results as $result)
 
-            <div class="card">
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
 
-                <h2>
-                    {{ $result['name'] }}
-                </h2>
+                <div class="px-4 sm:px-6 py-4 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
+                    <h2 class="text-lg font-semibold text-gray-900 dark:text-white">{{ $result['name'] }}</h2>
 
-                @if($result['status'])
+                    @if($result['status'])
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
+                            Connected
+                        </span>
+                    @else
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200">
+                            Connection Failed
+                        </span>
+                    @endif
+                </div>
 
-                    <span class="status success">
-                        ● Connected
-                    </span>
+                <div class="p-4 sm:p-6">
+                    @if($result['status'])
 
-                    <div class="info">
+                        <div class="grid grid-cols-2 gap-y-3 gap-x-4">
+                            <div class="text-sm font-medium text-gray-500 dark:text-gray-400">Connection</div>
+                            <div class="text-sm text-gray-900 dark:text-white">{{ $result['connection'] }}</div>
 
-                        <div class="label">
-                            Connection
+                            <div class="text-sm font-medium text-gray-500 dark:text-gray-400">Database</div>
+                            <div class="text-sm text-gray-900 dark:text-white">{{ $result['database'] }}</div>
+
+                            <div class="text-sm font-medium text-gray-500 dark:text-gray-400">Host</div>
+                            <div class="text-sm text-gray-900 dark:text-white">{{ $result['host'] }}</div>
+
+                            <div class="text-sm font-medium text-gray-500 dark:text-gray-400">Port</div>
+                            <div class="text-sm text-gray-900 dark:text-white">{{ $result['port'] }}</div>
+
+                            <div class="text-sm font-medium text-gray-500 dark:text-gray-400">Response</div>
+                            <div class="text-sm font-bold text-gray-900 dark:text-white">{{ $result['response_time'] }} ms</div>
+
+                            <div class="text-sm font-medium text-gray-500 dark:text-gray-400">Products Table</div>
+                            <div class="text-sm">
+                                @if($result['products_table'])
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
+                                        Available
+                                    </span>
+                                @else
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200">
+                                        Missing
+                                    </span>
+                                @endif
+                            </div>
+
+                            <div class="text-sm font-medium text-gray-500 dark:text-gray-400">Product Count</div>
+                            <div class="text-sm font-bold text-gray-900 dark:text-white">{{ $result['product_count'] }}</div>
                         </div>
 
-                        <div>
-                            {{ $result['connection'] }}
+                    @else
+
+                        <div class="grid grid-cols-2 gap-y-3 gap-x-4">
+                            <div class="text-sm font-medium text-gray-500 dark:text-gray-400">Connection</div>
+                            <div class="text-sm text-gray-900 dark:text-white">{{ $result['connection'] }}</div>
+
+                            <div class="text-sm font-medium text-gray-500 dark:text-gray-400">Database</div>
+                            <div class="text-sm text-gray-900 dark:text-white">{{ $result['database'] }}</div>
+
+                            <div class="text-sm font-medium text-gray-500 dark:text-gray-400">Host</div>
+                            <div class="text-sm text-gray-900 dark:text-white">{{ $result['host'] }}</div>
+
+                            <div class="text-sm font-medium text-gray-500 dark:text-gray-400">Port</div>
+                            <div class="text-sm text-gray-900 dark:text-white">{{ $result['port'] }}</div>
                         </div>
 
-
-                        <div class="label">
-                            Database
+                        <div class="mt-4 bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 rounded-lg p-4">
+                            <p class="text-sm text-red-800 dark:text-red-200">
+                                <strong>Error:</strong> {{ $result['error'] }}
+                            </p>
                         </div>
 
-                        <div>
-                            {{ $result['database'] }}
-                        </div>
-
-
-                        <div class="label">
-                            Host
-                        </div>
-
-                        <div>
-                            {{ $result['host'] }}
-                        </div>
-
-
-                        <div class="label">
-                            Port
-                        </div>
-
-                        <div>
-                            {{ $result['port'] }}
-                        </div>
-
-
-                        <div class="label">
-                            Response
-                        </div>
-
-                        <div class="response">
-                            {{ $result['response_time'] }} ms
-                        </div>
-
-
-                        <div class="label">
-                            Products Table
-                        </div>
-
-                        <div>
-
-                            @if($result['products_table'])
-
-                                <span class="status success">
-                                    Available
-                                </span>
-
-                            @else
-
-                                <span class="status danger">
-                                    Missing
-                                </span>
-
-                            @endif
-
-                        </div>
-
-
-                        <div class="label">
-                            Product Count
-                        </div>
-
-                        <div>
-                            {{ $result['product_count'] }}
-                        </div>
-
-                    </div>
-
-                @else
-
-                    <span class="status danger">
-                        ● Connection Failed
-                    </span>
-
-                    <div class="info">
-
-                        <div class="label">
-                            Connection
-                        </div>
-
-                        <div>
-                            {{ $result['connection'] }}
-                        </div>
-
-
-                        <div class="label">
-                            Database
-                        </div>
-
-                        <div>
-                            {{ $result['database'] }}
-                        </div>
-
-
-                        <div class="label">
-                            Host
-                        </div>
-
-                        <div>
-                            {{ $result['host'] }}
-                        </div>
-
-
-                        <div class="label">
-                            Port
-                        </div>
-
-                        <div>
-                            {{ $result['port'] }}
-                        </div>
-
-                    </div>
-
-
-                    <div class="error">
-
-                        <strong>
-                            Error:
-                        </strong>
-
-                        {{ $result['error'] }}
-
-                    </div>
-
-                @endif
+                    @endif
+                </div>
 
             </div>
 
@@ -364,8 +99,4 @@
 
     </div>
 
-</div>
-
-</body>
-
-</html>
+@endsection
