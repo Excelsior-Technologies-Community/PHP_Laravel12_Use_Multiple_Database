@@ -13,4 +13,19 @@ class Product extends Model
         'name',
         'detail',
     ];
+
+    /**
+     * Primary database connection.
+     */
+    protected $connection = 'mysql';
+
+    /**
+     * Change database connection dynamically.
+     */
+    public function useDatabase(string $connection): static
+    {
+        $this->setConnection($connection);
+
+        return $this;
+    }
 }
