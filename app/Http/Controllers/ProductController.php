@@ -2,18 +2,49 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Product;
+use Illuminate\Support\Facades\DB;
+use Throwable;
 
 class ProductController extends Controller
 {
     /**
-     * Fetch record from second database
+     * Display products from both databases.
+     */
+    public function index()
+    {
+        try {
+            $defaultProducts = DB::connection('mysql')
+                ->table('products')
+                ->orderBy('id', 'desc')
+                ->get();
+
+            $secondProducts = DB::connection('mysql_second')
+                ->table('products')
+                ->orderBy('id', 'desc')
+                ->get();
+
+            return view(
+                'products.index',
+                compact(
+                    'defaultProducts',
+                    'secondProducts'
+                )
+            );
+        } catch (Throwable $e) {
+            return back()->with(
+                'error',
+                'Unable to load products: ' . $e->getMessage()
+            );
+        }
+    }
+
+    /**
+     * Original dynamic database connection example.
      */
     public function getRecord()
     {
-        $product = new Product;
+        $product = new \App\Models\Product;
 
-        // Switch database connection dynamically
         $product->setConnection('mysql_second');
 
         return $product->find(1);
